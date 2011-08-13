@@ -106,7 +106,7 @@ public final class Main {
             mv.setIdentity();
             pro.setIdentity();
 
-            SetOrtho(0, Display.getDisplayMode().getWidth(), 0, Display.getDisplayMode().getHeight(), -1, 1);
+            //SetOrtho(0, Display.getDisplayMode().getWidth(), 0, Display.getDisplayMode().getHeight(), -1, 1);
 
             shader = new Shader("sandbox/shaders/simple");
             _world = new World();
@@ -121,19 +121,21 @@ public final class Main {
         GL11.glLoadIdentity();
         GL11.glOrtho(0, Display.getDisplayMode().getWidth(), 0, Display.getDisplayMode().getHeight(), -1, 1);
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
-
-        GL11.glEnable(GL11.GL_TEXTURE_2D);
+        
+        GL11.glClearDepth(1.0);
     }
 
     private void render() {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glLoadIdentity();
         shader.Bind();
+
         shader.SetProjection(pro);
         shader.SetModelview(mv);
         
         _world.Render();
         _player.Render();
+        
         shader.Unbind();
     }
 

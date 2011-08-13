@@ -9,12 +9,14 @@ import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.nio.ShortBuffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javolution.util.FastList;
 import javolution.util.FastMap;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL21;
@@ -39,51 +41,68 @@ public final class World extends DrawableObject {
     private final Thread _updateThread;
     int vao;
     int vbo;
+    int ibo;
+    short pindex_quad[] = new short[6];
+    float pvertex_quad[] = new float[4 * 4];
 
     public World() {
+
         try {
             _TileList.put("Grass", TextureLoader.getTexture("png", ResourceLoader.getResource("sandbox/images/grass.png").openStream(), GL11.GL_NEAREST));
         } catch (IOException ex) {
             Logger.getLogger(World.class.getName()).log(Level.SEVERE, ex.toString(), ex);
         }
-        
-        float[] vertices = new float[18];
-        float z = -1;
 
-        vertices[0] = -5;
-        vertices[1] = -5;
-        vertices[2] = z; // Bottom left corner  
-        vertices[3] = -5;
-        vertices[4] = 5;
-        vertices[5] = z; // Top left corner  
-        vertices[6] = 5;
-        vertices[7] = 5;
-        vertices[8] = z; // Top Right corner  
+        //A quad
+        pvertex_quad[0] = -0.8f;
+        pvertex_quad[1] = -0.5f;
+        pvertex_quad[2] = -0.9f;
+        pvertex_quad[3] = 0xFFFFFFFF;
 
-        vertices[9] = 5;
-        vertices[10] = -5;
-        vertices[11] = z; // Bottom right corner  
-        vertices[12] = -5;
-        vertices[13] = -5;
-        vertices[14] = z; // Bottom left corner  
-        vertices[15] = 5;
-        vertices[16] = 5;
-        vertices[17] = z; // Top Right corner 
+        pvertex_quad[4] = 0.0f;
+        pvertex_quad[5] = -0.5f;
+        pvertex_quad[6] = -0.9f;
+        pvertex_quad[7] = 0xFFFF0000;
 
+        pvertex_quad[8] = -0.8f;
+        pvertex_quad[9] = 0.5f;
+        pvertex_quad[10] = -0.9f;
+        pvertex_quad[11] = 0xFF00FF00;
 
-        vao = GL30.glGenVertexArrays();
-        GL30.glBindVertexArray(vao);
+        pvertex_quad[12] = 0.0f;
+        pvertex_quad[13] = 0.5f;
+        pvertex_quad[14] = -0.9f;
+        pvertex_quad[15] = 0xFF0000FF;
+
+        pindex_quad[0] = 0;
+        pindex_quad[1] = 1;
+        pindex_quad[2] = 2;
+        pindex_quad[3] = 2;
+        pindex_quad[4] = 1;
+        pindex_quad[5] = 3;
+
+        ibo = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ibo);
+        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, (ShortBuffer) ByteBuffer.allocateDirect(6 * 2).asShortBuffer().put(pindex_quad).flip(), GL15.GL_STATIC_DRAW);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
 
         vbo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, (FloatBuffer) ByteBuffer.allocateDirect(4 * 4 * 4).asFloatBuffer().put(pvertex_quad).flip(), GL15.GL_STATIC_DRAW);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
-        FloatBuffer buf = ByteBuffer.allocateDirect(18 * 8).asFloatBuffer().put(vertices);
-        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buf, GL15.GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
+        vao = GL30.glGenVertexArrays();
+        GL30.glBindVertexArray(vao);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
+        GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 4 * 4, 0);
+        GL20.glEnableVertexAttribArray(0);
 
-        GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0); // Set up our vertex attributes pointer  
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ibo);
 
-        GL20.glEnableVertexAttribArray(0); // Disable our Vertex Array Object  
-        GL30.glBindVertexArray(0); // Disable our Vertex Buffer Object 
+        GL30.glBindVertexArray(0);
+        GL20.glDisableVertexAttribArray(0);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
 
         _updateThread = new Thread(new Runnable() {
 
@@ -118,8 +137,9 @@ public final class World extends DrawableObject {
     @Override
     public void Render() {
         GL30.glBindVertexArray(vao);
-        GL20.glEnableVertexAttribArray(0);
-        GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 6);
+
+        GL12.glDrawRangeElements(GL11.GL_TRIANGLES, 0, 3, 6, GL11.GL_UNSIGNED_SHORT, 0);
+
         GL30.glBindVertexArray(0);
     }
 

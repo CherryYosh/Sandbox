@@ -44,20 +44,20 @@ public class Shader {
             GL20.glAttachShader(_program, _vsID);
             GL20.glAttachShader(_program, _fsID);
 
-            //GL20.glBindAttribLocation(_program, 0, "modelview");
             //GL20.glBindAttribLocation(_program, 1, "projection");
             GL30.glBindFragDataLocation(_program, 0, "pixelColor");
+            GL20.glBindAttribLocation(_program, 0, "vertex");
+            GL20.glBindAttribLocation(_program, 1, "color");
             
             GL20.glLinkProgram(_program);
             GL20.glValidateProgram(_program);
-             Helper.LOGGER.log(Level.INFO, GL20.glGetShaderInfoLog(_program, 200));
+            Helper.LOGGER.log(Level.INFO, GL20.glGetShaderInfoLog(_program, 200));
         }
         
         //textureLoc = GL20.glGetUniformLocation(_program, "tex");
         modelviewLoc = GL20.glGetUniformLocation(_program, "modelview");
         projectionLoc = GL20.glGetUniformLocation(_program, "projection");
-        tmpPos = GL20.glGetAttribLocation(_program, "in_Position");
-        
+        tmpPos = GL20.glGetAttribLocation(_program, "vertex");        
     }
 
     public void Bind() {
