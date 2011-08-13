@@ -12,6 +12,8 @@ import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.GL11;
 
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector3f;
 import sandbox.utils.Helper;
 import sandbox.world.World;
 import sandbox.actor.Player;
@@ -28,6 +30,8 @@ public final class Main {
     World _world = null;
     Player _player = null;
     Shader shader;
+    public static Matrix4f mv = new Matrix4f();
+    public static Matrix4f pro = new Matrix4f();
 
     /**
      * @param args the command line arguments
@@ -98,7 +102,12 @@ public final class Main {
             Mouse.create();
 
             InitGL();
-            
+
+            mv.setIdentity();
+            pro.setIdentity();
+
+            SetOrtho(0, Display.getDisplayMode().getWidth(), 0, Display.getDisplayMode().getHeight(), -1, 1);
+
             shader = new Shader("sandbox/shaders/simple");
             _world = new World();
             _player = new Player();
@@ -112,7 +121,7 @@ public final class Main {
         GL11.glLoadIdentity();
         GL11.glOrtho(0, Display.getDisplayMode().getWidth(), 0, Display.getDisplayMode().getHeight(), -1, 1);
         GL11.glMatrixMode(GL11.GL_MODELVIEW);
-        
+
         GL11.glEnable(GL11.GL_TEXTURE_2D);
     }
 
@@ -120,8 +129,24 @@ public final class Main {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glLoadIdentity();
         shader.Bind();
+        shader.SetProjection(pro);
+        shader.SetModelview(mv);
+        
         _world.Render();
         _player.Render();
         shader.Unbind();
+    }
+
+    public void SetOrtho(float left, float right, float bottom, float top, float near, float far) {
+        Vector3f scale = new Vector3f(2.0f / (right - left),
+                2.0f / (top - bottom),
+                -2.0f / (far - near));
+        Vector3f trans = new Vector3f(-(right + left) / (right - left),
+                -(top + bottom) / (top - bottom),
+                -(far + near) / (far - near));
+
+        mv.setIdentity();
+        mv.scale(scale);
+        mv.translate(trans);
     }
 }

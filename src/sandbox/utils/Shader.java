@@ -7,8 +7,12 @@ package sandbox.utils;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.ByteBuffer;
+import java.nio.FloatBuffer;
 import java.util.logging.Level;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL30;
+import org.lwjgl.util.vector.Matrix4f;
 import org.newdawn.slick.util.ResourceLoader;
 
 /**
@@ -23,10 +27,10 @@ public class Shader {
 
     
     // GLSL Shader variable positions
-    private int uniform_texture = 0;
-    private int attr_position = 0;
-    private int attr_coords = 0;
-    private int attr_color = 0;
+    private int textureLoc = -1;
+    private int modelviewLoc = -1;
+    private int projectionLoc = -1;
+    public int tmpPos = -1;
 
     public Shader(String name) {
         _program = GL20.glCreateProgram();
@@ -40,18 +44,20 @@ public class Shader {
             GL20.glAttachShader(_program, _vsID);
             GL20.glAttachShader(_program, _fsID);
 
-            GL20.glBindAttribLocation(_program, 0, "v_position");
-            GL20.glBindAttribLocation(_program, 1, "v_color");
-            GL20.glBindAttribLocation(_program, 2, "v_coords");
+            //GL20.glBindAttribLocation(_program, 0, "modelview");
+            //GL20.glBindAttribLocation(_program, 1, "projection");
+            GL30.glBindFragDataLocation(_program, 0, "pixelColor");
             
             GL20.glLinkProgram(_program);
             GL20.glValidateProgram(_program);
+             Helper.LOGGER.log(Level.INFO, GL20.glGetShaderInfoLog(_program, 200));
         }
         
-        uniform_texture = GL20.glGetUniformLocation(_program, "tex");
-        attr_position = GL20.glGetAttribLocation(_program, "v_position");
-        attr_coords = GL20.glGetAttribLocation(_program, "v_coords");
-        attr_color = GL20.glGetAttribLocation(_program, "v_color");
+        //textureLoc = GL20.glGetUniformLocation(_program, "tex");
+        modelviewLoc = GL20.glGetUniformLocation(_program, "modelview");
+        projectionLoc = GL20.glGetUniformLocation(_program, "projection");
+        tmpPos = GL20.glGetAttribLocation(_program, "in_Position");
+        
     }
 
     public void Bind() {
@@ -63,7 +69,19 @@ public class Shader {
     }
 
     public int GetTextureIndex() {
-        return uniform_texture;
+        return textureLoc;
+    }
+    
+    public void SetProjection(Matrix4f m){
+        FloatBuffer buf = ByteBuffer.allocateDirect(16*4).asFloatBuffer();
+        m.store(buf);
+        GL20.glUniformMatrix4(projectionLoc, false,  buf );
+    }
+    
+    public void SetModelview(Matrix4f m){
+        FloatBuffer buf = ByteBuffer.allocateDirect(16*4).asFloatBuffer();
+        m.store(buf);
+        GL20.glUniformMatrix4(modelviewLoc, false,  buf);
     }
 
     private int CreateVertShader(String name) {
@@ -75,6 +93,7 @@ public class Shader {
 
         GL20.glShaderSource(_vsID, ReadShaderFile(name+".vert"));
         GL20.glCompileShader(_vsID);
+        Helper.LOGGER.log(Level.INFO, GL20.glGetShaderInfoLog(_vsID, 200));
 
         return _vsID;
     }
@@ -89,6 +108,7 @@ public class Shader {
 
         GL20.glShaderSource(_fsID, ReadShaderFile(name+".frag"));
         GL20.glCompileShader(_fsID);
+        Helper.LOGGER.log(Level.INFO, GL20.glGetShaderInfoLog(_fsID, 200));
 
         return _fsID;
     }

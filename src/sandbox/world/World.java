@@ -20,8 +20,6 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL21;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL30;
-import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector3f;
 import sandbox.DrawableObject;
 import sandbox.utils.Helper;
 
@@ -41,8 +39,6 @@ public final class World extends DrawableObject {
     private final Thread _updateThread;
     int vao;
     int vbo;
-    Matrix4f mv;
-    Matrix4f pro;
 
     public World() {
         try {
@@ -51,14 +47,9 @@ public final class World extends DrawableObject {
             Logger.getLogger(World.class.getName()).log(Level.SEVERE, ex.toString(), ex);
         }
         
-        SetOrtho(0, Display.getDisplayMode().getWidth(), 0, Display.getDisplayMode().getHeight(), -1, 1);
-        
-        mv.setIdentity();
-        pro.setIdentity();
-
         float[] vertices = new float[18];
-        float z = -10;
-        
+        float z = -1;
+
         vertices[0] = -5;
         vertices[1] = -5;
         vertices[2] = z; // Bottom left corner  
@@ -86,7 +77,7 @@ public final class World extends DrawableObject {
         vbo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
 
-        FloatBuffer buf = ByteBuffer.allocateDirect(18*8).asFloatBuffer().put(vertices);
+        FloatBuffer buf = ByteBuffer.allocateDirect(18 * 8).asFloatBuffer().put(vertices);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, buf, GL15.GL_STATIC_DRAW); // Set the size and data of our VBO and set it to STATIC_DRAW  
 
         GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0); // Set up our vertex attributes pointer  
@@ -123,23 +114,10 @@ public final class World extends DrawableObject {
             _updateThread.notify();
         }
     }
-    
-   public void SetOrtho( float left, float right, float bottom, float top, float near, float far ){
-	Vector3f scale = new Vector3f( 	2.0f / ( right - left ),
-							2.0f / ( top - bottom ),
-							-2.0f / ( far - near ) );
-	Vector3f trans = new Vector3f(	-( right + left ) / ( right - left ),
-							-( top + bottom ) / ( top - bottom ),
-							-( far + near ) / ( far - near ) );
-
-	mv.setIdentity();
-	mv.scale(scale);
-	mv.translate( trans );
-}
 
     @Override
     public void Render() {
-        GL30.glBindVertexArray(vbo);
+        GL30.glBindVertexArray(vao);
         GL20.glEnableVertexAttribArray(0);
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, 6);
         GL30.glBindVertexArray(0);

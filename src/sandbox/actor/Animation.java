@@ -22,7 +22,6 @@ import sandbox.utils.Helper;
 public class Animation {
 
     public enum LOOPTYPE {
-
         NONE,
         PINGPONG,
         LOOP;
