@@ -60,13 +60,13 @@ public class Player extends DrawableObject {
 
         GL11.glBegin(GL11.GL_QUADS);
             GL11.glTexCoord2f(1.0f, 1.0f);
-            GL11.glVertex2i(0, 0);
+            GL11.glVertex2f(0, 0);
             GL11.glTexCoord2f(.0f, 1.0f);
-            GL11.glVertex2i(32, 0);
+            GL11.glVertex2f(.1f, 0);
             GL11.glTexCoord2f(0.0f, 0.0f);
-            GL11.glVertex2i(32, 32);
+            GL11.glVertex2f(.1f, .1f);
             GL11.glTexCoord2f(1.0f, 0.0f);
-            GL11.glVertex2i(0, 32);
+            GL11.glVertex2f(0, .1f);
        GL11.glEnd();  
        GL11.glPopMatrix();
     }

@@ -116,12 +116,7 @@ public final class Main {
         }
     }
 
-    private void InitGL() {
-        GL11.glMatrixMode(GL11.GL_PROJECTION);
-        GL11.glLoadIdentity();
-        GL11.glOrtho(0, Display.getDisplayMode().getWidth(), 0, Display.getDisplayMode().getHeight(), -1, 1);
-        GL11.glMatrixMode(GL11.GL_MODELVIEW);
-        
+    private void InitGL() {       
         GL11.glClearDepth(1.0);
     }
 
@@ -134,7 +129,7 @@ public final class Main {
         shader.SetModelview(mv);
         
         _world.Render();
-        _player.Render();
+        //_player.Render();
         
         shader.Unbind();
     }
