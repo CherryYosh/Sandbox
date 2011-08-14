@@ -31,7 +31,7 @@ public final class Main {
     Player _player = null;
     Shader shader;
     public static Matrix4f mv = new Matrix4f();
-    public static Matrix4f pro = new Matrix4f();
+    public static Matrix4f projection = new Matrix4f();
 
     /**
      * @param args the command line arguments
@@ -78,6 +78,7 @@ public final class Main {
             } else {
                 try {
                     Thread.sleep(1000);
+                    //MoveCamera(1, 1);
                 } catch (InterruptedException e) {
                 }
 
@@ -104,9 +105,11 @@ public final class Main {
             InitGL();
 
             mv.setIdentity();
-            pro.setIdentity();
+            projection.setIdentity();
 
-            //SetOrtho(0, Display.getDisplayMode().getWidth(), 0, Display.getDisplayMode().getHeight(), -1, 1);
+            SetOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, 0, 1000);
+            //SetProjection(45, Display.getDisplayMode().getWidth() / Display.getDisplayMode().getHeight(), 1, 1000);
+            MoveCamera(0, 0, -1);
 
             shader = new Shader("sandbox/shaders/simple");
             _world = new World();
@@ -116,7 +119,9 @@ public final class Main {
         }
     }
 
-    private void InitGL() {       
+    private void InitGL() {
+        GL11.glViewport(0, 0, 640, 480);
+        
         GL11.glClearDepth(1.0);
     }
 
@@ -125,12 +130,12 @@ public final class Main {
         GL11.glLoadIdentity();
         shader.Bind();
 
-        shader.SetProjection(pro);
+        shader.SetProjection(projection);
         shader.SetModelview(mv);
-        
+
         _world.Render();
         //_player.Render();
-        
+
         shader.Unbind();
     }
 
@@ -142,8 +147,36 @@ public final class Main {
                 -(top + bottom) / (top - bottom),
                 -(far + near) / (far - near));
 
-        mv.setIdentity();
-        mv.scale(scale);
-        mv.translate(trans);
+        projection.setIdentity();
+        projection.scale(scale);
+        projection.translate(trans);
+    }
+
+    public void MoveCamera(int x, int y, int z) {
+        mv.m30 += x;
+        mv.m31 += y;
+        mv.m32 += z;
+    }
+
+    public void SetProjection(float fovy, float aspecty, float near, float far) {
+        float fov = fovy;
+        float aspect = aspecty;
+        float zNear = near;
+        float zFar = far;
+
+        float f = (float) (1.0 / Math.tan(fovy / 2.0));
+        //set up the scale
+        //http://www.opengl.org/sdk/docs/man/xhtml/gluPerspective.xml
+        Vector3f scale = new Vector3f(f / aspect,
+                f,
+                (zFar + zNear) / (zNear - zFar));
+
+        //sets the values of [i,i] = 1 other wise all are 0
+        projection.setIdentity();
+        //set the projection data
+        projection.scale(scale);
+        projection.m23 = -1.0f;
+        projection.m32 = (float) (2.0 * zFar * zNear) / (zNear - zFar);
+        projection.m33 = 0.0f;
     }
 }

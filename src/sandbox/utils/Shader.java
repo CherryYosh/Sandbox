@@ -8,6 +8,7 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.logging.Level;
 import org.lwjgl.opengl.GL11;
@@ -72,16 +73,20 @@ public class Shader {
     }
 
     public void SetProjection(Matrix4f m) {
-        FloatBuffer buf = ByteBuffer.allocateDirect(16 * Helper.FLOAT_SIZE).asFloatBuffer();
+        FloatBuffer buf = ByteBuffer.allocateDirect(16 * Helper.FLOAT_SIZE).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        buf.rewind();
         m.store(buf);
-        buf.flip();
+        //buf.flip();
+        buf.rewind();
         GL20.glUniformMatrix4(projectionLoc, false, buf);
     }
 
     public void SetModelview(Matrix4f m) {
-        FloatBuffer buf = ByteBuffer.allocateDirect(16 * Helper.FLOAT_SIZE).asFloatBuffer();
+        FloatBuffer buf = ByteBuffer.allocateDirect(16 * Helper.FLOAT_SIZE).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        buf.rewind();
         m.store(buf);
-        buf.flip();
+        //buf.flip();
+        buf.rewind();
         GL20.glUniformMatrix4(modelviewLoc, false, buf);
     }
 

@@ -1,11 +1,11 @@
 #version 140
 
+uniform mat4 projection;
+uniform mat4 modelview;
+
 in vec3 vertex;
-in vec2 texCoord;
-out vec2 tex;
 
 void main(){
 	
-	gl_Position = vec4(vertex, 1.0);
-        tex = texCoord;
+	gl_Position = (projection * modelview) * vec4(vertex, 1.0);
 }
