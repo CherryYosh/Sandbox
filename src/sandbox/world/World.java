@@ -49,20 +49,18 @@ public final class World extends DrawableObject {
         float x, y, z;
         float q, r;
         final static int paddings = 3; //keep it alligned with 32.
+                
+        final static int DataSizeInBytes = (5 + paddings) * Helper.FLOAT_SIZE;
 
         float[] data() {
-            float[] ret = new float[3];
+            float[] ret = new float[5 + paddings];
             ret[0] = x;
             ret[1] = y;
             ret[2] = z;
-            //ret[3] = q;
-            //ret[4] = r;
+            ret[3] = q;
+            ret[4] = r;
 
             return ret;
-        }
-
-        public int sizeofData() {
-            return (3) * Helper.FLOAT_SIZE;
         }
     }
 
@@ -82,22 +80,22 @@ public final class World extends DrawableObject {
                 t[0].x = (x + 0) * 32f;
                 t[0].y = (y + 0) * 32f;
                 t[0].z = 1f;
-                //t[0].q = 1;
-                //t[0].r = 1;
+                t[0].q = 1;
+                t[0].r = 1;
 
                 t[1] = new VertexData();
                 t[1].x = (x + 1) * 32f;
                 t[1].y = (y + 0) * 32f;
                 t[1].z = 1.0f;
-                //t[1].q = 0;
-                //t[1].r = 1;
+                t[1].q = 0;
+                t[1].r = 1;
 
                 t[2] = new VertexData();
                 t[2].x = (x + 0) * 32f;
                 t[2].y = (y + 1) * 32f;
                 t[2].z = 1f;
-                //t[2].q = 0;
-                //t[2].r = 0;
+                t[2].q = 0;
+                t[2].r = 0;
 
                 t[3] = new VertexData();
                 t[3].x = (x + 1) * 32f;
@@ -113,13 +111,12 @@ public final class World extends DrawableObject {
             }
         }
 
-        FloatBuffer tilebuf = ByteBuffer.allocateDirect(3*4 * tileArray.size()).order(ByteOrder.nativeOrder()).asFloatBuffer();
+        FloatBuffer tilebuf = ByteBuffer.allocateDirect(VertexData.DataSizeInBytes * tileArray.size()).order(ByteOrder.nativeOrder()).asFloatBuffer();
         for (FastList.Node<VertexData> n = tileArray.head(), end = tileArray.tail(); (n = n.getNext()) != end;) {
             VertexData d =  n.getValue();  
             tilebuf.put(d.data());
         }
         tilebuf.flip();
-        //tilebuf.rewind();
         
         vbo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
@@ -129,10 +126,10 @@ public final class World extends DrawableObject {
         vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
-        GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
-        //GL20.glVertexAttribPointer(1, 2, GL11.GL_FLOAT, false, 5 * 4, 3*4);
+        GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, VertexData.DataSizeInBytes, 0);
+        GL20.glVertexAttribPointer(1, 2, GL11.GL_FLOAT, false, VertexData.DataSizeInBytes, 3*Helper.FLOAT_SIZE);
         GL20.glEnableVertexAttribArray(0);
-        //GL20.glEnableVertexAttribArray(1);
+        GL20.glEnableVertexAttribArray(1);
         GL11.glEnableClientState( GL11.GL_VERTEX_ARRAY );
 
         GL30.glBindVertexArray(0);
