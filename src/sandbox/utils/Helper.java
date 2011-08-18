@@ -27,6 +27,8 @@ public final class Helper {
     public static final int LONG_SIZE = 8;
     public static final int DOUBLE_SIZE = 8;
     
+    public static final int SCALE = 32;
+    
     public static final Logger LOGGER = Logger.getLogger("sandbox");
     
     private static Helper _instance = null;

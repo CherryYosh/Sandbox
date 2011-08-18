@@ -10,6 +10,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 import sandbox.DrawableObject;
+import sandbox.Main;
 import sandbox.actor.Animation.LOOPTYPE;
 import sandbox.utils.Helper;
 
