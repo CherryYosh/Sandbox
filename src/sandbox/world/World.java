@@ -29,6 +29,7 @@ import sandbox.utils.Helper;
 import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
+import sandbox.actor.Player;
 
 /**
  *
@@ -41,6 +42,7 @@ public final class World extends DrawableObject {
     int vbo;
     int ibo;
     FastList<Tile> tileArray = new FastList<Tile>();
+    Player player;
 
     public World() {
 
@@ -102,6 +104,9 @@ public final class World extends DrawableObject {
         GL20.glDisableVertexAttribArray(1);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
         GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        
+        
+        player = new Player();
     }
 
     @Override
@@ -109,12 +114,15 @@ public final class World extends DrawableObject {
         GL30.glBindVertexArray(vao);
         _TileList.get("Grass").bind();
 
-        GL11.glDrawElements(GL11.GL_TRIANGLES, tileArray.size()*4, GL11.GL_UNSIGNED_INT, 0);
+        GL11.glDrawElements(GL11.GL_TRIANGLES, tileArray.size()*6, GL11.GL_UNSIGNED_INT, 0);
+        
+        player.Render();
         
         GL30.glBindVertexArray(0);
     }
 
     @Override
     public void Update(long t) {
+        player.Update(t);
     }
 }

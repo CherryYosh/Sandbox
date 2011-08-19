@@ -29,7 +29,7 @@ public final class Main {
     private final int _MAXFPS = 60;
     private boolean _run = true;
     World _world = null;
-    static Camera camera;
+    public static Camera camera;
     Shader shader;
 
     /**
@@ -100,8 +100,8 @@ public final class Main {
 
             InitGL();
 
-            _world = new World();
             camera = new Camera();
+            _world = new World();
             shader = new Shader("sandbox/shaders/simple");
         } catch (Exception e) { //General catch-all
             Helper.LOGGER.log(Level.SEVERE, e.toString(), e);

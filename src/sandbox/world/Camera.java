@@ -35,10 +35,16 @@ public class Camera {
         projection.translate(trans);
     }
 
-    public void Move(int x, int y, int z) {
+    public void Move(float x, float y, float z) {
         orthographic.m30 += x;
         orthographic.m31 += y;
         orthographic.m32 += z;
+    }
+    
+    public void SetPosition(float x, float y, float z){
+        orthographic.m30 = x;
+        orthographic.m31 = y;
+        orthographic.m32 = z;
     }
 
     public void SetProjection(float fovy, float aspecty, float near, float far) {
