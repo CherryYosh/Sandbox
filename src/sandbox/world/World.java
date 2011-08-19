@@ -56,6 +56,7 @@ public final class World extends DrawableObject {
             }
         }
 
+        //Generate the VBO vertex data
         FloatBuffer tilebuf = ByteBuffer.allocateDirect(Tile.VertexData.DataSizeInBytes * (tileArray.size() * 4)).order(ByteOrder.nativeOrder()).asFloatBuffer();
         for (FastList.Node<Tile> n = tileArray.head(), end = tileArray.tail(); (n = n.getNext()) != end;) {
             Tile t =  n.getValue();  
@@ -63,10 +64,27 @@ public final class World extends DrawableObject {
         }
         tilebuf.flip();
         
+        //Generate the ibo data;
+        IntBuffer indexbuf = ByteBuffer.allocateDirect(tileArray.size()*6*Helper.INT_SIZE).order(ByteOrder.nativeOrder()).asIntBuffer();
+        for(int i = 0; i < tileArray.size()*4; i+=4){
+            indexbuf.put(i);
+            indexbuf.put(i+1);
+            indexbuf.put(i+3);
+            indexbuf.put(i+1);
+            indexbuf.put(i+2);
+            indexbuf.put(i+3);
+        }
+        indexbuf.flip();
+        
         vbo = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, tilebuf, GL15.GL_STATIC_DRAW);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        
+        ibo = GL15.glGenBuffers();
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ibo);
+        GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indexbuf, GL15.GL_STATIC_DRAW);
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
 
         vao = GL30.glGenVertexArrays();
         GL30.glBindVertexArray(vao);
@@ -76,6 +94,8 @@ public final class World extends DrawableObject {
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
         GL11.glEnableClientState( GL11.GL_VERTEX_ARRAY );
+        
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, ibo);
 
         GL30.glBindVertexArray(0);
         GL20.glDisableVertexAttribArray(0);
@@ -88,8 +108,8 @@ public final class World extends DrawableObject {
     public void Render() {
         GL30.glBindVertexArray(vao);
 
-        GL11.glDrawArrays(GL11.GL_QUADS, 0, tileArray.size()*4);
-
+        GL11.glDrawElements(GL11.GL_TRIANGLES, tileArray.size()*4, GL11.GL_UNSIGNED_INT, 0);
+        
         GL30.glBindVertexArray(0);
     }
 
