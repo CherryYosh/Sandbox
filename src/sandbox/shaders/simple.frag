@@ -1,7 +1,10 @@
 #version 140
 
+in vec2 in_texCoord;
 out vec4 pixelColor;
 
+uniform sampler2D texture;
+
 void main(){
-	pixelColor = vec4(0, 1, 0,1); //texture2D(tex, texCoord.st);
+	pixelColor = texture2D(texture, in_texCoord.st);
 }

@@ -90,7 +90,7 @@ public final class World extends DrawableObject {
         GL30.glBindVertexArray(vao);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbo);
         GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, Tile.VertexData.DataSizeInBytes, 0);
-        GL20.glVertexAttribPointer(1, 2, GL11.GL_FLOAT, false, Tile.VertexData.DataSizeInBytes, 3*Helper.FLOAT_SIZE);
+        GL20.glVertexAttribPointer(1, 2, GL11.GL_FLOAT, false, Tile.VertexData.DataSizeInBytes, 3*Helper.FLOAT_SIZE); //the texture data
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
         GL11.glEnableClientState( GL11.GL_VERTEX_ARRAY );
@@ -107,6 +107,7 @@ public final class World extends DrawableObject {
     @Override
     public void Render() {
         GL30.glBindVertexArray(vao);
+        _TileList.get("Grass").bind();
 
         GL11.glDrawElements(GL11.GL_TRIANGLES, tileArray.size()*4, GL11.GL_UNSIGNED_INT, 0);
         

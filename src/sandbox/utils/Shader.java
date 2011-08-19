@@ -57,7 +57,7 @@ public class Shader {
         modelviewLoc = GL20.glGetUniformLocation(_program, "modelview");
         projectionLoc = GL20.glGetUniformLocation(_program, "projection");
         vertexLoc = GL20.glGetAttribLocation(_program, "vertex");
-        textureLoc = GL20.glGetAttribLocation(_program, "texture");
+        textureLoc = GL20.glGetUniformLocation(_program, "texture");
     }
 
     public void Bind() {
