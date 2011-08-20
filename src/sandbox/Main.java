@@ -30,7 +30,7 @@ public final class Main {
     private boolean _run = true;
     World _world = null;
     public static Camera camera;
-    Shader shader;
+    public static Shader shader;
 
     /**
      * @param args the command line arguments
@@ -70,7 +70,7 @@ public final class Main {
             if (Display.isActive()) {
 
                 render();
-                Display.sync(_MAXFPS);
+                //Display.sync(_MAXFPS);
 
             } else {
                 try {
@@ -116,7 +116,6 @@ public final class Main {
 
     private void render() {
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
-        GL11.glLoadIdentity();
         
         shader.Bind();
         shader.SetModelview(camera.GetOrthographic());

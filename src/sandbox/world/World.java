@@ -30,6 +30,7 @@ import org.newdawn.slick.opengl.Texture;
 import org.newdawn.slick.opengl.TextureLoader;
 import org.newdawn.slick.util.ResourceLoader;
 import sandbox.actor.Player;
+import sandbox.utils.Shader;
 
 /**
  *
@@ -116,9 +117,9 @@ public final class World extends DrawableObject {
 
         GL11.glDrawElements(GL11.GL_TRIANGLES, tileArray.size()*6, GL11.GL_UNSIGNED_INT, 0);
         
-        player.Render();
-        
         GL30.glBindVertexArray(0);
+                
+        player.Render();
     }
 
     @Override

@@ -15,6 +15,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 import sandbox.DrawableObject;
 import sandbox.Main;
@@ -29,10 +30,10 @@ public class Player extends DrawableObject {
     
     private float[] tmpVertexData = new float[]{
         //X,Y,Z,Q,R,P,P,P
-        0,0,0,0,0,0,0,0,
-        Helper.SCALE,0,0,1,0,0,0,0,
-        Helper.SCALE,Helper.SCALE,0,1,1,0,0,0,
-        0,Helper.SCALE,0,0,1,0,0,0
+        0,0,0,0,1,0,0,0,
+        Helper.SCALE,0,0,1,1,0,0,0,
+        Helper.SCALE,-Helper.SCALE,0,1,0,0,0,0,
+        0,-Helper.SCALE,0,0,0,0,0,0
         };
     private int[] tmpIndexData = new int[]{ 0,1,3,1,2,3};
     private int vbo,ibo,vao;
@@ -62,10 +63,10 @@ public class Player extends DrawableObject {
             Helper.LOGGER.log(Level.INFO, "Finished loading the animation set...");
         }
         
-        _position.set(16, 16);
+        _position.set(0,0);
         _sprite = _SpriteList.get("Human");
         _CurrentAnimation = _sprite.get("StandBack");
-        Main.camera.SetPosition(-16*32,-16*32,0);
+        Main.camera.SetPosition(-16*Helper.SCALE,-16*Helper.SCALE,0);
         
         
         ///*******************ARGGGHHHGHGHGHGHG
@@ -109,14 +110,19 @@ public class Player extends DrawableObject {
     }
 
     @Override
-    public void Render() {       
+    public void Render() { 
+        Matrix4f mat = new Matrix4f();
+        //mat.translate(new Vector3f(_position.x, _position.y, 0));
+        
         GL30.glBindVertexArray(vao);
         _CurrentAnimation.BindTexture(_Frame);
+        Main.shader.SetModelview(mat);
 
         GL11.glDrawElements(GL11.GL_TRIANGLES, 6, GL11.GL_UNSIGNED_INT, 0);
-
         
         GL30.glBindVertexArray(0);
+
+        Main.shader.SetModelview(Main.camera.GetOrthographic());
     }
 
     @Override

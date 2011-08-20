@@ -19,6 +19,7 @@ public class Camera {
 
     public Camera() {
         projection.setIdentity();
+        orthographic.setIdentity();
         SetOrtho(0, Display.getDisplayMode().getWidth(), Display.getDisplayMode().getHeight(), 0, 0, 1000);
     }
 
@@ -36,15 +37,14 @@ public class Camera {
     }
 
     public void Move(float x, float y, float z) {
-        orthographic.m30 += x;
-        orthographic.m31 += y;
-        orthographic.m32 += z;
+        orthographic.translate(new Vector3f(x,y,z));
     }
     
     public void SetPosition(float x, float y, float z){
-        orthographic.m30 = x;
-        orthographic.m31 = y;
-        orthographic.m32 = z;
+       orthographic.m30 = x;//orthographic.m00 * x + orthographic.m10 * y + orthographic.m20 * z;
+       orthographic.m31 = y;//orthographic.m01 * x + orthographic.m11 * y + orthographic.m21 * z;
+       orthographic.m32 = z;//orthographic.m02 * x + orthographic.m12 * y + orthographic.m22 * z;
+       //orthographic.m33 = orthographic.m03 * x + orthographic.m13 * y + orthographic.m23 * z;
     }
 
     public void SetProjection(float fovy, float aspecty, float near, float far) {
@@ -67,6 +67,14 @@ public class Camera {
         projection.m23 = -1.0f;
         projection.m32 = (float) (2.0 * zFar * zNear) / (zNear - zFar);
         projection.m33 = 0.0f;
+    }
+    
+    public void SetProjection(Matrix4f mat){
+        projection.load(mat);
+    }
+    
+    public void SetOrthographic(Matrix4f mat){
+        orthographic.load(mat);
     }
 
     public Matrix4f GetProjection() {
